@@ -9,6 +9,8 @@
 #      W3C-LinkChecker
 #           github: https://github.com/w3c/link-checker
 #           git: https://github.com/w3c/link-checker.git
+#      LWP::Protocol::https
+#           -No more 503 Errors
 
 #Imports
 import sys
@@ -42,13 +44,15 @@ def main():
         outFile.close()
         counter = links.qsize()
         for x in range (0, counter):
+            nextLink = links.get()
             outFile = open('../data-files/output.txt', 'a')
             print("Testing file (" + str(x + 1) + "/" + str(counter) + "):"),
-            outFile.write("Testing File (" + str(x + 1) + "/" + str(counter) + ")\n")
+            outFile.write("Testing URL: " + "(" + str(x + 1) + "/" + str(counter) + ") "  + nextLink)
+            outFile.write("")
             outFile.write("_____________________\n")
             outFile.close()
             #write output here
-            checkLink(links.get())
+            checkLink(nextLink)
     except IOError:
         print("Failed\n")
         print("output.txt could not be opened successfully. \nCheck if file exists.")
@@ -58,42 +62,24 @@ def main():
 
     print("\nProgram successfully completed!")
 
-def checkLink(string url):
+def checkLink(url):
     #Check the url
     url = str(url).strip()
     print(str(url))
     outFile = open('../data-files/output.txt', 'a')
     outputText = subprocess.check_output(["checklink", "-b", "-q", str(url)])
     outputText = outputText.decode("utf-8")
-    #Fix the output so it only catches 404 errors.
-    
-    outputText = str(outputText).splitlines()
-    firstText = outputText.pop()
-    if (firstText == "Error: 500 Access to 'file' URIs has been disabled"):
-        print("Error code 500, program failed.")
-        sys.exit(-1)
-    print(firstText)
-    outFile.write(str(outputText.pop()))
-    outputText.pop()
-    outputText.pop()
-    outputText.pop()
-    for x in range (0, (outputText.count("")/5)):
-        outFile.write("\n")
-        url = outputText.pop()
-        #print("URL: " + str(url))
-        line = outputText.pop()
-        print ("Error Line: " + str(url))
-        code = outputText.pop()
-        print ("Code: " + str(code))
-        if(code == "Code: 404 Not Found"):
-            outFile.write(str(url))
-            outFile.write(str(line))
-            outFile.write(str(code))
-            outFile.write("\n")
-        outputText.pop()
-    outFile.write("\n\n")
-    outFile.close()
-    return "Success"
 
+    #Fix the output so it only catches 404 errors.
+    outputTextArray = str(outputText).splitlines()
+    for curr in range(len(outputTextArray)):
+        if(outputTextArray[curr].find("404") > -1):
+            outFile.write("Broken Link: " + outputTextArray[curr - 2] + "\n")
+            outFile.write("Found on" + outputTextArray[curr - 1] + "\n")
+            outFile.write("Error"  + outputTextArray[curr] + "\n")
+            outFile.write("\n")
+    outFile.write("\n\n")
+    outFile.write("_____________________\n")
+    outFile.close()
 
 main()
