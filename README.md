@@ -8,7 +8,7 @@ This program is a python script, used in conjunction with the W3C link-checker. 
 | `Python 2.7.13`| https://www.python.org/downloads/release/python-2713/|
 | `W3C link-checker`| https://github.com/w3c/link-checker|
 
-**NOTE**: The program may work on other versions of Python, but these have not been fully tested and may have issues. Python 3 is **NOT** currently supported.
+**NOTE**: The program may work on other versions of Python 2, but these have not been fully tested and may have issues. Python 3 is **NOT** currently supported.
 
 ### Python Libraries
 **This program uses Python 2**, and assumes it is installed with your operating system. It does not require any additional libraries to be installed.
